@@ -1,7 +1,15 @@
+// goals:
+/*
+ - implement multithreading as a means of testing
+ - optimize! (using bitwise AND?)
+*/
+
+
 // check for even parity
 // there should be an even number of 1 bits in the bit sequence + parity bit
 
 #include <stdio.h>
+#include <pthread.h>
 
 #define NOPARITYBIT -1
 
@@ -42,33 +50,34 @@ int dataVerifier(int data[2])
 }
 
 
-int main()
+// mimics sending of data from a different location by using a separate thread to initialize and transmit data to the original thread
+int* sendData(void)
 {
-    printf("1. %d\n", getParity(15)); // expect 4
-    printf("2. %d\n", getParity(1)); // expect 1
-    printf("3. %d\n", getParity(16)); // expect 1
-    printf("4. %d\n", getParity(32)); // expect 1
-    printf("5. %d\n\n", getParity(31)); // expect 5
-
-    // TEST 1: Data is correctly transmitted, expect it to be received correctly.
     int dataToSend[2] = {31, NOPARITYBIT};
     if(getParity(dataToSend[0] % 2 != 0))
         dataToSend[1] = 1;
     else 
         dataToSend[1] = 0;
 
-    if(dataVerifier(dataToSend))
+    return 31, 0;
+}
+
+
+
+int main(void)
+{
+    // ptr to store location of data array
+    int* pdata;
+    // create thread to simulate sending of data
+    pthread_t threadId;
+    pthread_create(&threadId, NULL, sendData, NULL);
+    pthread_join(threadId, pdata);
+    // dereference data
+
+    if(dataVerifier(newData))
         printf("Data was correctly received.\n");
     else
         printf("Data was incorrectly received.\n");
 
-    // TEST 2: Data is "damaged" during transit, expect it to be received incorrectly.
-    int damagedData[2] = {7, 0};
-
-    if(dataVerifier(damagedData))
-        printf("Data was correctly received.\n");
-    else
-        printf("Data was incorrectly received.\n");
-    
     return 0;
 }
